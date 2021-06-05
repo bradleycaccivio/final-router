@@ -43,11 +43,12 @@ router.route("/students")
         let params = {
             name: req.body.name,
             usrname: req.body.usrname,
-            pswrd: req.body.pswrd
+            pswrd: req.body.pswrd,
+            type: req.body.type
         };
         for(let prop in params) if(!params[prop]) delete params[prop];
         var size = Object.keys(params).length;
-        if (size < 3) {
+        if (size < 4) {
             res.status(500).send();
         } else {
             Student.create(params).save()
@@ -100,10 +101,41 @@ router.route("/students/:id")
             })
     });
 
+router.route("/students/:un&:pw")
+    .get((req, res) => {
+        console.log(`GET /students/${req.params.un}&${req.params.pw}`);
+        Student.find({$and: [{usrname: {$eq: `${req.params.un}`}},
+                             {pswrd: {$eq: `${req.params.pw}`}}]
+                     })
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                console.log("hi");
+                res.status(404).send();
+            })
+    });
+
 router.route("/students/:id/sessions")
     .get((req, res) => {
         console.log(`GET /students/${req.params.id}/sessions`);
         Session.find({ students: `${req.params.id}` })
+            .sort('day')
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                res.status(404).send();
+            })
+    });
+
+router.route("/students/:id/availablesessions")
+    .get((req, res) => {
+        console.log(`GET /students/${req.params.id}/availablesessions`);
+        Session.find({$and: [{students: {$ne: `${req.params.id}`} },
+                             {full: {$ne: true}}]
+                     })
+            .sort('day')
             .then(data => {
                 res.status(200).send(data);
             })
@@ -128,11 +160,12 @@ router.route("/instructors")
         let params = {
             name: req.body.name,
             usrname: req.body.usrname,
-            pswrd: req.body.pswrd
+            pswrd: req.body.pswrd,
+            type: req.body.type
         };
         for(let prop in params) if(!params[prop]) delete params[prop];
         var size = Object.keys(params).length;
-        if (size < 3) {
+        if (size < 4) {
             res.status(500).send();
         } else {
             Instructor.create(params).save()
@@ -143,6 +176,18 @@ router.route("/instructors")
                     res.status(404).send();
                 })
         }
+    });
+
+router.route("/instructos/:un&:pw")
+    .get((req, res) => {
+        console.log("GET /instructors/upw");
+        Instructors.findOne({ $and: [{usrname: {$eq: `${req.params.usrname}`}}, {pswrd: {$eq: `${req.params.pswrd}`}}] })
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                res.status(404).send();
+            })
     });
 
 router.route("/instructors/:id")
@@ -187,8 +232,9 @@ router.route("/instructors/:id")
 
 router.route("/instructors/:id/sessions")
     .get((req, res) => {
-        console.log(`GET /students/${req.params.id}/sessions`);
+        console.log(`GET /instructors/${req.params.id}/sessions`);
         Session.find({ instructor: `${req.params.id}` })
+            .sort('day')
             .then(data => {
                 res.status(200).send(data);
             })
@@ -201,6 +247,7 @@ router.route("/sessions")
     .get((req, res) => {
         console.log("GET /sessions");
         Session.find({})
+            .sort('day')
             .then(data => {
                 res.status(200).send(data);
             })
@@ -214,6 +261,7 @@ router.route("/sessions")
             instructor: req.body.instructor,
             students: req.body.students,
             capacity: req.body.capacity,
+            full: req.body.full,
             day: req.body.day
         };
         for(let prop in params) if(!params[prop]) delete params[prop];
@@ -226,6 +274,7 @@ router.route("/sessions")
                     res.status(201).send(data);
                 })
                 .catch(err => {
+                    console.log(err);
                     res.status(404).send();
                 })
         }
@@ -248,6 +297,7 @@ router.route("/sessions/:id")
             instructor: req.body.instructor,
             students: req.body.students,
             capacity: req.body.capacity,
+            full: req.body.full,
             day: req.body.day
         };
         for(let prop in params) if(!params[prop]) delete params[prop];

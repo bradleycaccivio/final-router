@@ -15,6 +15,10 @@ const InstructorSchema = new Schema({
     pswrd: {
         type: Schema.Types.String,
         required: true
+    },
+    type: {
+        type: Schema.Types.String,
+        required: true
     }
 });
 
@@ -24,6 +28,7 @@ InstructorSchema.statics.create = function(obj) {
     instructor.name = obj.name;
     instructor.usrname = obj.usrname;
     instructor.pswrd = obj.pswrd;
+    instructor.type = obj.type;
     return instructor;
 }
 

@@ -15,6 +15,10 @@ const StudentSchema = new Schema({
     pswrd: {
         type: Schema.Types.String,
         required: true
+    },
+    type: {
+        type: Schema.Types.String,
+        required: true
     }
 });
 
@@ -24,6 +28,7 @@ StudentSchema.statics.create = function(obj) {
     student.name = obj.name;
     student.usrname = obj.usrname;
     student.pswrd = obj.pswrd;
+    student.type = obj.type;
     return student;
 }
 

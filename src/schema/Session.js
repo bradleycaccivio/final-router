@@ -15,6 +15,9 @@ const SessionSchema = new Schema({
     capacity: {
         type: Schema.Types.Number
     },
+    full: {
+        type: Schema.Types.Boolean
+    },
     day: {
         type: Schema.Types.Date,
         required: true
@@ -27,6 +30,7 @@ SessionSchema.statics.create = function(obj) {
     session.instructor = obj.instructor;
     session.students = obj.students;
     session.capacity = obj.capacity;
+    session.full = obj.full;
     session.day = obj.day;
     return session;
 }
